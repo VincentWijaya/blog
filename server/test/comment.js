@@ -4,12 +4,14 @@ var chai = require('chai')
 var expect = chai.expect
 var Article = require('../models/Article')
 var User = require('../models/User')
+var Comment = require('../models/Comment')
 var jwt = require('jsonwebtoken')
 var token
 var userId
 var articleId
+var commentId
 
-describe('Articles', () => {
+describe('Comment', () => {
   
   beforeEach((done) => {    
     User.create({name: 'Tono', email: 'tono@mail.com', password: '123456'})
@@ -34,7 +36,19 @@ describe('Articles', () => {
             Article.create(newArticle)
               .then(article => {
                 articleId = String(article._id)
-                done()
+                
+                let newComment = {
+                  articleId: articleId,
+                  comment: 'Mantap jiwa bosq!',
+                  userId: userId
+                }
+                
+                Comment.create(newComment)
+                  .then(comment => {
+                    commentId = String(comment._id)
+                    
+                    done()
+                  })
               })
           })
       })
@@ -43,56 +57,34 @@ describe('Articles', () => {
   afterEach((done) => {
     Article.remove({}, () => {
       User.remove({}, () => {
-        done()
+        Comment.remove({}, () => {
+          done()
+        })
       })
     })
   })
   
-  it('GET /articles should return all article', (done) => {
+  it('POST /comment should return new comment', (done) => {
     chai.request(app)
-      .get('/articles')
-      .end((err, result) => {
-        expect(result).to.have.status(200)
-        expect(result.body).to.be.a('array')
-        expect(result.body).to.have.lengthOf(1)
-        expect(result.body[0]).to.have.property('title')
-        expect(result.body[0].title).to.equal('Article 1')
-        done()
-      })
-  })
-  
-  it('POST /articles should return new article', (done) => {
-    chai.request(app)
-      .post('/articles')
-      .send({title: 'Article 1', content: 'aljgasjgsahgaslgjaljg'})
+      .post(`/comment/${articleId}`)
+      .send({comment: 'Mantap jiwa', articleId: articleId, userId: userId})
       .set('token', token)
       .end((err, result) => {
         expect(result).to.have.status(201)
-        expect(result.body).to.have.property('title')
+        expect(result.body).to.have.property('comment')
         expect(result.body.userId).to.equal(userId)
         done()
       })
   })
   
-  it('DELETE /articles/:id should return deleted article id', (done) => {
+  it('DELETE /comment:id should return deleted comment id', (done) => {
     chai.request(app)
-      .delete(`/articles/${articleId}`)
+      .delete(`/comment/${commentId}`)
+      .send({articleId: articleId})
       .set('token', token)
       .end((err, result) => {
         expect(result).to.have.status(200)
-        expect(result.body.id).to.equal(articleId)
-        done()
-      })
-  })
-  
-  it('PUT /articles/:id should return updated article', (done) => {
-    chai.request(app)
-      .put(`/articles/${articleId}`)
-      .send({name: 'Article 2', content: 'alighiajtrliajrlijalj'})
-      .set('token', token)
-      .end((err, result) => {
-        expect(result).to.have.status(200)
-        expect(result.body.id).to.equal(articleId)
+        expect(result.body.id).to.equal(commentId)
         done()
       })
   })
