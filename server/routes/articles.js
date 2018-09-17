@@ -7,6 +7,8 @@ const articleController = require('../controllers/article')
 
 router.get('/', articleController.getArticle)
 
+router.get('/:id', articleController.findArticle)
+
 router.post('/', auth, articleController.createArticle)
 
 router.delete('/:id', auth, article, articleController.deleteArticle)

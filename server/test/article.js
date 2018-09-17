@@ -97,4 +97,15 @@ describe('Articles', () => {
       })
   })
   
+  it('GET /articles/:id should return spesific article', (done) => {
+    chai.request(app)
+      .get(`/articles/${articleId}`)
+      .end((err, result) => {
+        expect(result).to.have.status(200)
+        expect(result.body).to.have.property('title')
+        expect(result.body.comments).to.be.a('array')
+        done()
+      })
+  })
+  
 })

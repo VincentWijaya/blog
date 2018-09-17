@@ -55,6 +55,18 @@ class Controller {
       })
   }
   
+  static findArticle(req, res) {
+    Article.findById(req.params.id)
+      .populate('userId', '_id name')
+      .populate('comments', '_id comment')
+      .then(article => {
+        res.status(200).json(article)
+      })
+      .catch(err => {
+        res.status(500).json({error: err.message})
+      })
+  }
+  
 }
 
 module.exports = Controller
