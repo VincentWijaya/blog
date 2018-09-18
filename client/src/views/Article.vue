@@ -9,7 +9,7 @@
         </div>
 
         <div class="col-md-8 mt-5">
-          <router-view/>
+          <router-view :datalocal="datalocal"/>
         </div>
 
       </div>

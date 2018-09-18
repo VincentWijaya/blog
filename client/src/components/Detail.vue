@@ -5,11 +5,11 @@
       <h2 class="card-title text-center display-4">{{ this.article.title }}</h2>
       <p class="card-text">{{ this.article.content }}</p>
     </div>
-    <div class="card-footer text-muted">
+    <div class="card-footer text-muted mb-5">
       Posted on {{ this.created }} by {{ this.name }}
     </div>
 
-    <div class="my-3">
+    <div class="my-3" v-if="datalocal">
       <div class="form-group row">
         <div class="col-lg-5">
           <textarea class="form-control" rows="2" placeholder="Comment........." v-model="comment"></textarea>
@@ -27,7 +27,7 @@ import axios from 'axios'
 
 export default {
   name: 'detail',
-  props: ['id'],
+  props: ['id', 'datalocal'],
   data: function () {
     return {
       article: {},
