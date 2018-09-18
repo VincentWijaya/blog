@@ -1,4 +1,5 @@
 const Article = require('../models/Article')
+const Comment = require('../models/Comment')
 
 class Controller {
   
@@ -33,7 +34,13 @@ class Controller {
   static deleteArticle(req, res) {
     Article.deleteOne({_id: req.params.id})
       .then(() => {
-        res.status(200).json({message: 'Article deleted!', id: req.params.id})
+        Comment.deleteMany({articleId: req.params.id})
+          .then(() => {
+            res.status(200).json({message: 'Article deleted!', id: req.params.id})
+          })
+          .catch(err => {
+            res.status(500).json({error: err.message})
+          })
       })
       .catch(err => {
         res.status(500).json({error: err.message})
