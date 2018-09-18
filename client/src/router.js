@@ -14,10 +14,17 @@ export default new Router({
       component: Home
     },
     {
-      path: `/detail/:id`,
-      name: 'detail',
-      props: true,
-      component: () => import('./components/Detail.vue')
+      path: `/article`,
+      name: 'article',
+      component: () => import('./views/Article.vue'),
+      children: [
+        {
+          path: ':id',
+          name: 'article-detail',
+          props: true,
+          component: () => import('./components/Detail.vue')
+        }
+      ]
     }
     // {
     //   path: '/about',

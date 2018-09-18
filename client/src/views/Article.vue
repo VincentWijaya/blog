@@ -8,7 +8,9 @@
           <Sidebar :datalocal="datalocal"/>
         </div>
 
-        <router-view/>
+        <div class="col-md-8 mt-5">
+          <router-view/>
+        </div>
 
       </div>
     </div>

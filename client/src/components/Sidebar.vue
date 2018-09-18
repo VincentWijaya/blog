@@ -5,7 +5,7 @@
     <div class="list-group">
 
       <div class="list-group-item" v-for="article in articles" :key="article._id">
-        <router-link class="sidebar-title" :to="{ name: 'detail', params: {id: article._id} }">{{ article.title }}</router-link>
+        <router-link class="sidebar-title" :to="{ name: 'article-detail', params: {id: article._id} }">{{ article.title }}</router-link>
         <h6>By: {{ article.userId.name }}</h6>
       </div>
 
@@ -33,7 +33,7 @@
                 </div>
                 <div class="form-group">
                   <label for="content">Content:</label>
-                  <textarea rows="8" cols="80" v-model="content"></textarea>
+                  <textarea rows="8" cols="80" v-model="content" class="form-control"></textarea>
                 </div>
               </form>
 
