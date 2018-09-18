@@ -7,6 +7,6 @@ const commentController = require('../controllers/comment')
 
 router.post('/:id', auth, commentController.comment)
 
-router.delete('/:id', auth, commentController.deleteComment)
+router.delete('/:id', auth, comment, commentController.deleteComment)
 
 module.exports = router;
