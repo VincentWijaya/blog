@@ -4,7 +4,6 @@ const Article = require('../models/Article')
 class Controller {
   
   static comment(req, res) {
-    console.log(req.params.id);
     let newComment = {
       articleId: req.params.id,
       comment: req.body.comment,

@@ -74,6 +74,18 @@ describe('Articles', () => {
       })
   })
   
+  it('POST /articles without token should return error message', (done) => {
+    chai.request(app)
+      .post('/articles')
+      .send({title: 'Article 1', content: 'aljgasjgsahgaslgjaljg'})
+      .end((err, result) => {
+        expect(result).to.have.status(401)
+        expect(result.body).to.have.property('error')
+        expect(result.body.error).to.equal('Please login first')
+        done()
+      })
+  })
+  
   it('DELETE /articles/:id should return deleted article id', (done) => {
     chai.request(app)
       .delete(`/articles/${articleId}`)

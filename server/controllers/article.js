@@ -24,7 +24,11 @@ class Controller {
     
     Article.create(newArticle)
       .then(article => {
-        res.status(201).json(newArticle)
+        Article.findById(article._id)
+        .populate('userId', '_id name email')
+          .then(data => {
+            res.status(201).json(data)
+          })
       })
       .catch(err => {
         res.status(500).json({error: err.message})
