@@ -7,7 +7,8 @@
       <div class="list-group-item" v-for="article in articles" :key="article._id" v-if="isLoad">
         <router-link class="sidebar-title" :to="{ name: 'article-detail', params: {id: article._id} }">{{ article.title }}</router-link>
         <h6>By: {{ article.userId.name }}</h6>
-        <button type="button" class="btn btn-sm btn-danger" v-if="article.isHim" @click="deleteArticle(article._id)">Delete</button>
+        <button type="button" class="btn btn-sm btn-danger" v-if="article.isHim" @click="deleteArticle(article._id)">Delete</button>&nbsp;
+        <button type="button" class="btn btn-sm btn-primary" v-if="article.isHim" data-toggle="modal" data-target="#editArticleModal" @click="getEditArticle(article._id)">Edt</button>
       </div>
       <div class="loader" v-if="!isLoad"></div>
 
@@ -52,6 +53,46 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Edit Article -->
+    <div class="modal fade" id="editArticleModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Edit Article</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body" v-if="isLoadEdit">
+
+            <div class="container">
+              <form>
+                <div class="form-group">
+                  <label for="title">Title:</label>
+                  <input type="text" class="form-control" v-model="titleEdit" required>
+                </div>
+                <div class="form-group">
+                  <label for="content">Content:</label>
+                  <textarea rows="8" cols="80" v-model="contentEdit" class="form-control"></textarea>
+                </div>
+              </form>
+
+            </div>
+
+          </div>
+          <div class="loader" v-if="!isLoadEdit"></div>
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" v-if="isLoadEdit" v-on:click="editArticle">Edit Article</button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,7 +107,11 @@ export default {
       articles: [],
       title: '',
       content: '',
-      isLoad: false
+      isLoad: false,
+      isLoadEdit: false,
+      titleEdit: '',
+      contentEdit: '',
+      articleId: ''
     }
   },
   methods: {
@@ -115,6 +160,58 @@ export default {
       })
         .then(() => {
           self.articles.splice(indexArticle, 1)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    getEditArticle (id) {
+      this.articleId = id
+      let self = this
+
+      axios({
+        method: 'get',
+        url: `http://api.blog.skinborderevent.ml/articles/${id}`
+      })
+        .then(response => {
+          self.titleEdit = response.data.title
+          self.contentEdit = response.data.content
+          self.isLoadEdit = true
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    editArticle () {
+      let indexArticle
+      let self = this
+
+      this.articles.forEach((article, index) => {
+        if (article._id === this.articleId) {
+          indexArticle = index
+        }
+      })
+
+      axios({
+        method: 'put',
+        url: `http://api.blog.skinborderevent.ml/articles/${this.articleId}`,
+        headers: {
+          token: this.datalocal.token
+        },
+        data: {
+          title: this.titleEdit,
+          content: this.contentEdit
+        }
+      })
+        .then(() => {
+          self.articles[indexArticle].title = self.titleEdit
+          self.articles[indexArticle].content = self.contentEdit
+
+          this.$emit('new-article', self.articles[indexArticle])
+
+          self.titleEdit = ''
+          self.contentEdit = ''
+          self.articleId = ''
         })
         .catch(err => {
           console.log(err)

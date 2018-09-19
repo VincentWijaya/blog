@@ -21,9 +21,9 @@
       </div>
 
       <div class="card-footer text-muted mb-4" v-for="comment in article.comments" :key="comment._id" v-if="isLoad">
-        <h6>{{ comment.userId }}: </h6>
+        <h6>{{ comment.userId.name }}: </h6>
         <p>{{ comment.comment }}</p>
-        <button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash fa-sm"/></button>
+        <button type="button" class="btn btn-xs btn-danger" @click="deleteComment(comment._id)" v-if="comment.isHim"><i class="fa fa-trash fa-sm"/></button>
       </div>
 
       <div class="loader text-center" v-if="!isLoad"></div>
@@ -38,7 +38,7 @@ import axios from 'axios'
 
 export default {
   name: 'detail',
-  props: ['id', 'datalocal'],
+  props: ['id', 'datalocal', 'newarticle'],
   data: function () {
     return {
       article: {},
@@ -63,7 +63,36 @@ export default {
         }
       })
         .then(response => {
-          console.log(response.data)
+          response.data['isHim'] = true
+          self.article.comments.push(response.data)
+          self.comment = ''
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    deleteComment (commentId) {
+      let self = this
+      let indexComment
+
+      this.article.comments.forEach((comment, index) => {
+        if (comment._id === commentId) {
+          indexComment = index
+        }
+      })
+
+      axios({
+        method: 'delete',
+        url: `http://api.blog.skinborderevent.ml/comment/${commentId}`,
+        headers: {
+          token: this.datalocal.token
+        },
+        data: {
+          articleId: this.article._id
+        }
+      })
+        .then(() => {
+          self.article.comments.splice(indexComment, 1)
         })
         .catch(err => {
           console.log(err)
@@ -77,7 +106,14 @@ export default {
       url: `http://api.blog.skinborderevent.ml/articles/${this.id}`
     })
       .then(response => {
-        console.log(response.data.comments[0])
+        response.data.comments.forEach(comment => {
+          if (comment.userId.email === self.datalocal.email) {
+            comment['isHim'] = true
+          } else {
+            comment['isHim'] = false
+          }
+        })
+
         self.created = new Date(response.data.createdAt).toLocaleDateString()
         self.name = response.data.userId.name
         self.article = response.data
@@ -104,6 +140,9 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+    newarticle: function () {
+      this.article = this.newarticle
     }
   }
 }

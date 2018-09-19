@@ -159,6 +159,8 @@ export default {
           self.registerData.name = ''
           self.registerData.email = ''
           self.registerData.password = ''
+
+          this.$router.push({ path: '/article' })
         })
         .catch(err => {
           if (err.response) {
@@ -195,6 +197,7 @@ export default {
     logout () {
       localStorage.removeItem('data')
       this.data = false
+      this.$router.push({ path: '/' })
     }
   }
 }
