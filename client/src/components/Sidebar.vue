@@ -4,10 +4,12 @@
     <h1>List Articles</h1>
     <div class="list-group">
 
-      <div class="list-group-item" v-for="article in articles" :key="article._id">
+      <div class="list-group-item" v-for="article in articles" :key="article._id" v-if="isLoad">
         <router-link class="sidebar-title" :to="{ name: 'article-detail', params: {id: article._id} }">{{ article.title }}</router-link>
         <h6>By: {{ article.userId.name }}</h6>
+        <button type="button" class="btn btn-sm btn-danger" v-if="article.isHim" @click="deleteArticle(article._id)">Delete</button>
       </div>
+      <div class="loader" v-if="!isLoad"></div>
 
     </div>
 
@@ -63,7 +65,8 @@ export default {
     return {
       articles: [],
       title: '',
-      content: ''
+      content: '',
+      isLoad: false
     }
   },
   methods: {
@@ -72,7 +75,7 @@ export default {
 
       axios({
         method: 'post',
-        url: 'http://localhost:3000/articles',
+        url: 'http://api.blog.skinborderevent.ml/articles',
         data: {
           title: this.title,
           content: this.content
@@ -82,7 +85,7 @@ export default {
         }
       })
         .then(response => {
-          console.log(response.data)
+          response.data['isHim'] = true
           self.articles.push(response.data)
         })
         .catch(err => {
@@ -92,6 +95,30 @@ export default {
             console.log(err)
           }
         })
+    },
+    deleteArticle (id) {
+      let self = this
+      let indexArticle
+
+      this.articles.forEach((article, index) => {
+        if (article._id === id) {
+          indexArticle = index
+        }
+      })
+
+      axios({
+        method: 'delete',
+        url: `http://api.blog.skinborderevent.ml/articles/${id}`,
+        headers: {
+          token: this.datalocal.token
+        }
+      })
+        .then(() => {
+          self.articles.splice(indexArticle, 1)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
   created () {
@@ -99,10 +126,21 @@ export default {
 
     axios({
       method: 'get',
-      url: 'http://localhost:3000/articles'
+      url: 'http://api.blog.skinborderevent.ml/articles'
     })
       .then(response => {
+        let user = self.datalocal.email
+
+        response.data.forEach(article => {
+          if (article.userId.email === user) {
+            article['isHim'] = true
+          } else {
+            article['isHim'] = false
+          }
+        })
+
         self.articles = response.data
+        self.isLoad = true
       })
       .catch(err => {
         console.log(err)
@@ -112,7 +150,21 @@ export default {
 </script>
 
 <style scoped>
-.sidebar-title {
-  font-size: 1.5rem;
-}
+  .sidebar-title {
+    font-size: 1.5rem;
+  }
+
+  .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
 </style>

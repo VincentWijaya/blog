@@ -140,7 +140,7 @@ export default {
 
       axios({
         method: 'post',
-        url: 'http://localhost:3000/users/login',
+        url: 'http://api.blog.skinborderevent.ml/users/login',
         data: {
           email: this.emailLogin || this.registerData.email,
           password: this.passwordLogin || this.registerData.password
@@ -173,7 +173,7 @@ export default {
 
       axios({
         method: 'post',
-        url: 'http://localhost:3000/users',
+        url: 'http://api.blog.skinborderevent.ml/users',
         data: {
           name: this.registerData.name,
           email: this.registerData.email,

@@ -16,7 +16,11 @@ class Controller {
         
         Article.updateOne({_id: req.params.id}, {$push: {comments: commentId}})
           .then(() => {
-            res.status(201).json(newComment)
+            Comment.findById(commentId)
+              .populate('userId', '_id name email')
+              .then(comment => {
+                res.status(200).json(comment)
+              })
           })
           .catch(err => {
             res.status(500).json({error: err.message})

@@ -1,22 +1,33 @@
 <template>
-  <div class="card mb-4 my-5 mx-5 px-3">
+  <div>
+    <div class="card mb-4 my-5 mx-5 px-3">
 
-    <div class="card-body">
-      <h2 class="card-title text-center display-4">{{ this.article.title }}</h2>
-      <p class="card-text">{{ this.article.content }}</p>
-    </div>
-    <div class="card-footer text-muted mb-5">
-      Posted on {{ this.created }} by {{ this.name }}
-    </div>
+      <div class="card-body" v-if="isLoad">
+        <h2 class="card-title text-center display-4">{{ this.article.title }}</h2>
+        <p class="card-text">{{ this.article.content }}</p>
+      </div>
+      <div class="card-footer text-muted mb-5" v-if="isLoad">
+        Posted on {{ this.created }} by {{ this.name }}
+      </div>
 
-    <div class="my-3" v-if="datalocal">
-      <div class="form-group row">
-        <div class="col-lg-5">
-          <textarea class="form-control" rows="2" placeholder="Comment........." v-model="comment"></textarea>
-          <br>
-          <button type="button" class="btn btn-primary">Comment</button>
+      <div class="my-3" v-if="datalocal && isLoad">
+        <div class="form-group row">
+          <div class="col-lg-5">
+            <textarea class="form-control" rows="2" placeholder="Comment........." v-model="comment"></textarea>
+            <br>
+            <button type="button" class="btn btn-primary" @click="addComment">Comment</button>
+          </div>
         </div>
       </div>
+
+      <div class="card-footer text-muted mb-4" v-for="comment in article.comments" :key="comment._id" v-if="isLoad">
+        <h6>{{ comment._id }}: </h6>
+        <p>{{ comment.comment }}</p>
+        <button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash fa-sm"/></button>
+      </div>
+
+      <div class="loader text-center" v-if="!isLoad"></div>
+
     </div>
 
   </div>
@@ -33,20 +44,37 @@ export default {
       article: {},
       name: '',
       created: '',
-      comment: ''
+      comment: '',
+      isLoad: false
+    }
+  },
+  methods: {
+    addComment () {
+      let self = this
+
+      axios({
+        method: 'post',
+        url: `http://api.blog.skinborderevent.ml/comment/${this.article._id}`,
+        headers: {
+          token: this.datalocal.token
+        },
+        data: {
+          comment: this.comment
+        }
+      })
     }
   },
   created () {
     let self = this
-
     axios({
       method: 'get',
-      url: `http://localhost:3000/articles/${this.id}`
+      url: `http://api.blog.skinborderevent.ml/articles/${this.id}`
     })
       .then(response => {
         self.created = new Date(response.data.createdAt).toLocaleDateString()
         self.name = response.data.userId.name
         self.article = response.data
+        self.isLoad = true
       })
       .catch(err => {
         console.log(err)
@@ -58,12 +86,13 @@ export default {
 
       axios({
         method: 'get',
-        url: `http://localhost:3000/articles/${this.id}`
+        url: `http://api.blog.skinborderevent.ml/articles/${this.id}`
       })
         .then(response => {
           self.created = new Date(response.data.createdAt).toLocaleDateString()
           self.name = response.data.userId.name
           self.article = response.data
+          self.isLoad = true
         })
         .catch(err => {
           console.log(err)
@@ -72,3 +101,23 @@ export default {
   }
 }
 </script>
+
+<style>
+  .sidebar-title {
+    font-size: 1.5rem;
+  }
+
+  .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+</style>

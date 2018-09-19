@@ -5,7 +5,10 @@ class Controller {
   
   static getArticle(req, res) {
     Article.find()
-      .populate('userId', '_id name email')
+      .populate({
+        path: 'userId', 
+        select: '_id name email'
+      })
       .populate('comments', '_id comment')
       .then(articles => {
         res.status(200).json(articles)
