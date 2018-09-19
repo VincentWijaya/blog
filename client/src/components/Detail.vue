@@ -21,7 +21,7 @@
       </div>
 
       <div class="card-footer text-muted mb-4" v-for="comment in article.comments" :key="comment._id" v-if="isLoad">
-        <h6>{{ comment._id }}: </h6>
+        <h6>{{ comment }}: </h6>
         <p>{{ comment.comment }}</p>
         <button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash fa-sm"/></button>
       </div>
@@ -62,6 +62,12 @@ export default {
           comment: this.comment
         }
       })
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
   created () {

@@ -9,7 +9,15 @@ class Controller {
         path: 'userId', 
         select: '_id name email'
       })
-      .populate('comments', '_id comment')
+      .populate({
+        path: 'comments', 
+        select: '_id comment userId',
+        populate: {
+          path: 'userId',
+          model: 'User',
+          select: '_id name email'
+        }
+      })
       .then(articles => {
         res.status(200).json(articles)
       })
