@@ -21,7 +21,7 @@
       </div>
 
       <div class="card-footer text-muted mb-4" v-for="comment in article.comments" :key="comment._id" v-if="isLoad">
-        <h6>{{ comment }}: </h6>
+        <h6>{{ comment.userId }}: </h6>
         <p>{{ comment.comment }}</p>
         <button type="button" class="btn btn-xs btn-danger"><i class="fa fa-trash fa-sm"/></button>
       </div>
@@ -77,6 +77,7 @@ export default {
       url: `http://api.blog.skinborderevent.ml/articles/${this.id}`
     })
       .then(response => {
+        console.log(response.data.comments[0])
         self.created = new Date(response.data.createdAt).toLocaleDateString()
         self.name = response.data.userId.name
         self.article = response.data

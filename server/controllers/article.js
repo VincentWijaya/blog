@@ -80,7 +80,15 @@ class Controller {
   static findArticle(req, res) {
     Article.findById(req.params.id)
       .populate('userId', '_id name')
-      .populate('comments', '_id comment')
+      .populate({
+        path: 'comments', 
+        select: '_id comment userId',
+        populate: {
+          path: 'userId',
+          model: 'User',
+          select: '_id name email'
+        }
+      })
       .then(article => {
         res.status(200).json(article)
       })
